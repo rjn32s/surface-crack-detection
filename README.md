@@ -1,1 +1,1 @@
-# surface-crack-deterction
+# surface-crack-detection
