@@ -1,7 +1,7 @@
 clf;
 clc;
 clear all;
-Image = imread("texture-concrete-crack-old-preview.jpg");  # Change the  image from here
+Image = imread("texture-concrete-crack-old-preview.jpg");  % Change the  image from here
 [Image_Height,Image_Width,Number_Of_Colour_Channels] = size(Image);
 
 Block_Size = 50;
