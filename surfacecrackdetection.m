@@ -1,25 +1,29 @@
 function oImage = surfacecrackdetection(Image)
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This Code Block will Calculate the number of Blocks of image required for Given size of Block
 [Image_Height,Image_Width,Number_Of_Colour_Channels] = size(Image);
 
-Block_Size = 50;
-Number_Of_Blocks_Vertically = floor(Image_Height/Block_Size);
+Block_Size = 50; % Algorith Works better with this size
+Number_Of_Blocks_Vertically = floor(Image_Height/Block_Size); 
 Number_Of_Blocks_Horizontally = floor(Image_Width/Block_Size);
 Image_Blocks = struct('Blocks',[]);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Experiment%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Calculating the Global threshold for Image segmentation %%%%%%%%%%%%
 
 [counts,x] = imhist(im2gray(Image),16);
 T = otsuthresh(counts);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Iterating over each block and processing the small block of image.
 Index = 1;
 for Row = 1: +Block_Size: Number_Of_Blocks_Vertically*Block_Size
     for Column = 1: +Block_Size: Number_Of_Blocks_Horizontally*Block_Size
         
     Row_End = Row + Block_Size - 1;
     Column_End = Column + Block_Size - 1;
-        
+   % To handel the overflow from image  Boundary   
     if Row_End > Image_Height
        Row_End = Image_Height;
     end
@@ -39,16 +43,17 @@ for Row = 1: +Block_Size: Number_Of_Blocks_Vertically*Block_Size
     sz = size(test);
     gs = imadjust(dummy);
   
-    [counts,x] = imhist(dummy,16);
+    %[counts,x] = imhist(dummy,16);
 %stem(x,counts)
     %T = otsuthresh(counts);
+    % For smoothing the rough surfaces
     H = fspecial("average",21);
     gssmooth = imfilter(dummy,H,"replicate");
 
 
     %BW = imbinarize(gssmooth,min(0.19,T));
 
-
+    % Segmentation
     test(test < min(70,255*T)) = 0;
     test(test >= min(70,255*T)) = 255;
     detected = 255*uint8(~test);
@@ -57,19 +62,20 @@ for Row = 1: +Block_Size: Number_Of_Blocks_Vertically*Block_Size
     detected=imfilter(detected,avg);
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+    % This section Takes decission weather an image block have edge or not
     cost = sum(detected , 2);
     %cost2 = sum(detected , 1);
     if sum(cost) > 15000
         %disp('Fault Detected')
         im = cat(3,r,g+detected,b);
+        % Highlighting the Edge
         %imshow(detected,[]);title('Crack Detected');
     else
         im = cat(3,r,g,b);
 
     end% read image from datastore
 
-
+    # Making the Detected image
     oImage(Row:Row_End,Column:Column_End,:) = im;
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
