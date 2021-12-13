@@ -1,3 +1,3 @@
 # surface-crack-detection
 ## How to Run
-![alt-text](link)
+![alt-text](https://github.com/rjn32s/surface-crack-detection/blob/main/Open%20GUI.m%20file.gif)
